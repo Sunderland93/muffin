@@ -2075,15 +2075,21 @@ process_event (MetaDisplay          *display,
   MetaKeyBinding *binding;
   MetaKeyBindingAction action;
 
+  /* On Wayland, allow modifier key releases to be processed normally */
+  if (meta_is_wayland_compositor() && event->type == CLUTTER_KEY_RELEASE)
+    allow_release = TRUE;
+
   /* we used to have release-based bindings but no longer. */
   if (event->type == CLUTTER_KEY_RELEASE && !allow_release)
     return FALSE;
 
   resolved_combo.mask = mask_from_event_params (keys, event->modifier_state);
 
-  strip_self_mod (event->keyval,
-                  mask_from_event_params (keys, event->modifier_state),
-                  &resolved_combo.mask);
+  /* On Wayland, don't strip self-modifiers to allow proper modifier combinations */
+  if (!meta_is_wayland_compositor())
+    strip_self_mod (event->keyval,
+                    mask_from_event_params (keys, event->modifier_state),
+                    &resolved_combo.mask);
 
   binding = get_keybinding (keys, &resolved_combo);
 
@@ -2189,65 +2195,42 @@ process_special_modifier_key (MetaDisplay          *display,
   else
     xdisplay = NULL;
 
+  /* On Wayland, treat modifier keys like normal keys */
+  if (meta_is_wayland_compositor())
+    return FALSE;
+
   if (event->type == CLUTTER_KEY_PRESS)
+  {
+    /* check if we're just Pressing a captured modifier at this time */
+    if (modifier_only_keyval (event->keyval))
     {
-        /* check if we're just Pressing a captured modifier at this time */
-      if (modifier_only_keyval (event->keyval))
-        {
-          /* remember this state, because we'll need to know it for subsequent events */
-          modifier_key_only_pressed = TRUE;
-          /* We keep the keyboard frozen - this allows us to use ReplayKeyboard
-           * on the next event if it's not the release of this modifier key */
-          if (xdisplay)
-            XIAllowEvents (xdisplay,
-                           clutter_input_device_get_device_id (event->device),
-                           XISyncDevice, event->time);
+      /* remember this state, because we'll need to know it for subsequent events */
+      modifier_key_only_pressed = TRUE;
+      /* We keep the keyboard frozen - this allows us to use ReplayKeyboard
+       * on the next event if it's not the release of this modifier key */
+      if (xdisplay)
+        XIAllowEvents (xdisplay,
+                       clutter_input_device_get_device_id (event->device),
+                       XISyncDevice, event->time);
 
-          return TRUE;
-        }
-      else
-        {
-          modifier_key_only_pressed = FALSE;
-
-          if (process_event (display, window, event, FALSE, FALSE))
-            {
-              /* As normally, after we've handled a global key
-               * binding, we unfreeze the keyboard but keep the grab
-               * (this is important for something like cycling
-               * windows */
-
-              if (xdisplay)
-                XIAllowEvents (xdisplay,
-                               clutter_input_device_get_device_id (event->device),
-                               XIAsyncDevice, event->time);
-              return TRUE;
-            }
-          else
-            {
-              /* Replay the event so it gets delivered to our
-               * per-window key bindings or to the application */
-              if (xdisplay)
-                XIAllowEvents (xdisplay,
-                               clutter_input_device_get_device_id (event->device),
-                               XIReplayDevice, event->time);
-              return FALSE;
-            }
-        }
+        return TRUE;
     }
+    else
+    {
+      modifier_key_only_pressed = FALSE;
+      return FALSE;
+    }
+  }
   else
+  {
+    /* Handle key releases for modifier-only bindings */
+    if (modifier_only_keyval (event->keyval))
     {
-      /* We only care about key releases for modifier-only bindings -
-       * and only when that release directly follows a press.  When this happens,
-       * negate modifier_only_is_down, and allow the binding handler to accept
-       * a key release.
-       */
-      if (modifier_only_keyval (event->keyval))
-        {
-          if (modifier_key_only_pressed)
-            *allow_key_up = TRUE;
-          modifier_key_only_pressed = FALSE;
-        }
+      if (modifier_key_only_pressed)
+        *allow_key_up = TRUE;
+      modifier_key_only_pressed = FALSE;
     }
+  }
 
   return FALSE;
 }
@@ -2261,14 +2244,18 @@ process_modifier_only (MetaDisplay     *display,
 {
   MetaKeyBindingManager *keys = &display->key_binding_manager;
 
-  if (display->focus_window && !modifier_key_only_pressed)
-    {
-      ClutterInputDevice *source;
+  /* On Wayland, don't process modifier-only events specially */
+  if (meta_is_wayland_compositor())
+    return FALSE;
 
-      source = clutter_event_get_source_device ((ClutterEvent *) event);
-      if (meta_window_shortcuts_inhibited (display->focus_window, source))
-        return FALSE;
-    }
+  if (display->focus_window && !modifier_key_only_pressed)
+  {
+    ClutterInputDevice *source;
+
+    source = clutter_event_get_source_device ((ClutterEvent *) event);
+    if (meta_window_shortcuts_inhibited (display->focus_window, source))
+      return FALSE;
+  }
 
   return process_special_modifier_key (display,
                                        event,
