@@ -66,6 +66,7 @@ single_pixel_buffer_manager_create_1px_rgba32_buffer (struct wl_client   *client
 {
     MetaWaylandSinglePixelBuffer *single_pixel_buffer;
     struct wl_resource *buffer_resource;
+    MetaWaylandBuffer *buffer;
 
     single_pixel_buffer = g_new0 (MetaWaylandSinglePixelBuffer, 1);
     single_pixel_buffer->r = r;
@@ -78,7 +79,10 @@ single_pixel_buffer_manager_create_1px_rgba32_buffer (struct wl_client   *client
     wl_resource_set_implementation (buffer_resource,
                                     &single_pixel_buffer_implementation,
                                     single_pixel_buffer, NULL);
-    meta_wayland_buffer_from_resource (buffer_resource);
+
+    buffer = meta_wayland_buffer_from_resource (buffer_resource);
+
+    buffer->single_pixel.single_pixel_buffer = single_pixel_buffer;
 }
 
 static const struct wp_single_pixel_buffer_manager_v1_interface
