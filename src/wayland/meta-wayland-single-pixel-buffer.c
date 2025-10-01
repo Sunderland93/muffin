@@ -76,13 +76,15 @@ single_pixel_buffer_manager_create_1px_rgba32_buffer (struct wl_client   *client
 
     buffer_resource =
     wl_resource_create (client, &wl_buffer_interface, 1, buffer_id);
-    wl_resource_set_implementation (buffer_resource,
-                                    &single_pixel_buffer_implementation,
-                                    single_pixel_buffer, NULL);
 
     buffer = meta_wayland_buffer_from_resource (buffer_resource);
 
     buffer->single_pixel.single_pixel_buffer = single_pixel_buffer;
+
+    wl_resource_set_implementation (buffer_resource,
+                                    &single_pixel_buffer_implementation,
+                                    single_pixel_buffer, NULL);
+
 }
 
 static const struct wp_single_pixel_buffer_manager_v1_interface
@@ -119,7 +121,7 @@ meta_wayland_single_pixel_buffer_attach (MetaWaylandBuffer  *buffer,
     CoglContext *cogl_context =
     clutter_backend_get_cogl_context (clutter_backend);
     MetaWaylandSinglePixelBuffer *single_pixel_buffer =
-    wl_resource_get_user_data (buffer->resource);
+      meta_wayland_single_pixel_buffer_from_buffer (buffer);
     uint8_t data[4];
     CoglPixelFormat pixel_format;
     CoglTexture2D *tex_2d;
@@ -157,6 +159,9 @@ meta_wayland_single_pixel_buffer_from_buffer (MetaWaylandBuffer *buffer)
 {
     if (!buffer->resource)
         return NULL;
+
+    if (buffer->single_pixel.single_pixel_buffer)
+        return buffer->single_pixel.single_pixel_buffer;
 
     if (wl_resource_instance_of (buffer->resource, &wl_buffer_interface,
         &single_pixel_buffer_implementation))
