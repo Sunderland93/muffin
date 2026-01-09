@@ -941,7 +941,7 @@ distribute_natural_allocation (float          extra_space,
    */
 
   /* Sort descending by gap and position. */
-  g_qsort_with_data (spreading,
+  g_sort_array      (spreading,
                      n_requested_sizes, sizeof (unsigned int),
                      compare_gap, sizes);
 
