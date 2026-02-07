@@ -34,6 +34,10 @@ clutter_conform_tests_general_tests = [
   'color',
   'interval',
   'script-parser',
+  'timeline',
+  'timeline-interpolate',
+  'timeline-progress',
+  'timeline-rewind',
   'units',
 ]
 
@@ -75,6 +79,7 @@ foreach test : clutter_conform_tests
 
   test(test, test_executable,
     suite: ['clutter', 'clutter/conform'],
-    env: test_env
+    env: test_env,
+    is_parallel: false,
   )
 endforeach

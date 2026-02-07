@@ -44,7 +44,6 @@ struct _CoglFrameInfo
 
   int64_t global_frame_counter;
 
-  CoglOutput *output;
 };
 
 CoglFrameInfo *_cogl_frame_info_new (void);
