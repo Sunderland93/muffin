@@ -879,7 +879,6 @@ libmuffin-clutter-0.so.0 libmuffin0 #MINVER#
  clutter_matrix_init_identity@Base 5.3.0
  clutter_modifier_type_get_type@Base 5.3.0
  clutter_offscreen_effect_create_texture@Base 5.3.0
- clutter_offscreen_effect_get_pipeline@Base 6.6.0
  clutter_offscreen_effect_get_pipeline@Base 6.4.1
  clutter_offscreen_effect_get_target@Base 5.3.0
  clutter_offscreen_effect_get_target_rect@Base 5.3.0
@@ -1575,9 +1574,9 @@ libmuffin-cogl-0.so.0 libmuffin0 #MINVER#
  cogl_dma_buf_handle_get_width@Base 6.6.0
  cogl_dma_buf_handle_mmap@Base 6.6.0
  cogl_dma_buf_handle_munmap@Base 6.6.0
+ cogl_dma_buf_handle_new@Base 5.3.0
  cogl_dma_buf_handle_sync_read_end@Base 6.6.0
  cogl_dma_buf_handle_sync_read_start@Base 6.6.0
- cogl_dma_buf_handle_new@Base 5.3.0
  cogl_egl_context_get_egl_display@Base 5.3.0
  cogl_egl_texture_2d_new_from_image@Base 5.3.0
  cogl_fence_closure_get_user_data@Base 5.3.0
@@ -2054,8 +2053,6 @@ libmuffin.so.0 libmuffin0 #MINVER#
  meta_backend_set_keymap@Base 5.3.0
  meta_backend_set_numlock@Base 5.3.0
  meta_backend_x11_nested_get_type@Base 5.3.0
- meta_create_background_for_monitor@Base 6.6.0
- meta_get_background_actors_for_display@Base 6.6.0
  meta_barrier_destroy@Base 5.3.0
  meta_barrier_direction_get_type@Base 5.3.0
  meta_barrier_event_get_type@Base 5.3.0
@@ -2094,6 +2091,7 @@ libmuffin.so.0 libmuffin0 #MINVER#
  meta_compositor_unmanage@Base 5.3.0
  meta_compositor_window_opacity_changed@Base 5.3.0
  meta_compositor_window_shape_changed@Base 5.3.0
+ meta_create_background_for_monitor@Base 6.6.0
  meta_create_monitors_config_key_for_current_state@Base 5.3.0
  meta_crtc_get_type@Base 5.3.0
  meta_crtc_mode_get_type@Base 5.3.0
@@ -2112,7 +2110,7 @@ libmuffin.so.0 libmuffin0 #MINVER#
  meta_direction_get_type@Base 5.3.0
  meta_disable_unredirect_for_display@Base 5.3.0
  meta_display_add_custom_keybinding@Base 5.3.0
- meta_display_add_custom_keybinding_full@Base 6.8.0
+ meta_display_add_custom_keybinding_full@Base 6.7.3
  meta_display_add_ignored_crossing_serial@Base 5.3.0
  meta_display_add_keybinding@Base 5.3.0
  meta_display_begin_grab_op@Base 5.3.0
@@ -2186,6 +2184,7 @@ libmuffin.so.0 libmuffin0 #MINVER#
  meta_frame_type_to_string@Base 5.3.0
  meta_g_utf8_strndup@Base 5.3.0
  meta_get_backend@Base 5.3.0
+ meta_get_background_actors_for_display@Base 6.6.0
  meta_get_bottom_window_group_for_display@Base 5.3.0
  meta_get_desklet_container_for_display@Base 5.3.0
  meta_get_display@Base 5.3.0
@@ -2428,6 +2427,7 @@ libmuffin.so.0 libmuffin0 #MINVER#
  meta_prefs_get_mouse_zoom_enabled@Base 5.3.0
  meta_prefs_get_new_window_placement_mode@Base 5.6.1
  meta_prefs_get_num_workspaces@Base 5.3.0
+ meta_prefs_get_prevent_focus_stealing@Base 6.7.3
  meta_prefs_get_raise_on_click@Base 5.3.0
  meta_prefs_get_show_fallback_app_menu@Base 5.3.0
  meta_prefs_get_tile_maximize@Base 5.3.0
@@ -2719,8 +2719,8 @@ libmuffin.so.0 libmuffin0 #MINVER#
  meta_workspace_get_work_area_all_monitors@Base 5.3.0
  meta_workspace_get_work_area_for_monitor@Base 5.3.0
  meta_workspace_index@Base 5.3.0
- meta_workspace_list_windows@Base 5.3.0
  meta_workspace_list_unobscured_windows@Base 6.6.0
+ meta_workspace_list_windows@Base 5.3.0
  meta_workspace_manager_append_new_workspace@Base 5.3.0
  meta_workspace_manager_get_active_workspace@Base 5.3.0
  meta_workspace_manager_get_active_workspace_index@Base 5.3.0
