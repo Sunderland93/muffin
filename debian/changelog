@@ -1,3 +1,43 @@
+muffin (6.7.4) alfa; urgency=medium
+
+  [ Michael Webster ]
+  * meta-wayland-gtk-shell.c: Turn on desktop-icons in 'capabilities'.
+  * meta-stage-native.c: Implement set_cursor_visible vfunc.
+
+  [ Sav ]
+  * native: Add preferred-primary GPU selection via udev tag (#811)
+
+  [ Clement Lefebvre ]
+  * debug: Show GL renderer in .xsession-errors
+  * wayland: Implement wl_drm protocol to advertise render node to clients
+
+  [ Michael Webster ]
+  * wayland/dma-buf: Advertise real format modifiers to clients
+  * meta-egl.c: Don't pass DRM_FORMAT_MOD_INVALID as an explicit modifier.
+  * wayland/dma-buf: Implement zwp_linux_dmabuf_v1 feedback (v4)
+
+  [ Leigh Scott ]
+  * wayland: Prefer gbm over EGL (nvidia) (#773)
+
+  [ Michael Webster ]
+  * meta-renderer-native.c: native: Only accept GBM renderer when it's hardware-accelerated.
+  * meta-wayland-layer-shell.c: Avoid double-free during unclean client disconnects.
+  * meta-wayland-dma-buf.c: Clean up excessive logging.
+  * monitors: order logical monitors primary-first, then by connector
+  * display: Update some documentation.
+
+  [ Clement Lefebvre ]
+  * cursor/native: Fix typo
+  * cursor/native: Track actual HW cursor BO size
+  * meta-wayland-surface: Fix damage scaling when wp_viewport sets dst without src rect
+  * wayland: Handle early maximized client commits
+
+  [ Michael Webster ]
+  * wayland: Avoid size-change effects during forced maximize transition.
+  * xdg-shell: Don't warn on geometry committed before first buffer.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 02 Jul 2026 13:17:59 +0200
+
 muffin (6.7.3) alfa; urgency=medium
 
   [ Clement Lefebvre ]
