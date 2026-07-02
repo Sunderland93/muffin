@@ -107,6 +107,7 @@ static gboolean disable_workarounds = FALSE;
 static gboolean auto_raise = FALSE;
 static gboolean auto_raise_delay = 500;
 static gboolean focus_change_on_pointer_rest = FALSE;
+static gboolean prevent_focus_stealing = FALSE;
 static gboolean bell_is_visible = FALSE;
 static gboolean bell_is_audible = TRUE;
 static gboolean gnome_accessibility = FALSE;
@@ -372,6 +373,13 @@ static MetaBoolPreference preferences_bool[] =
         META_PREF_FOCUS_CHANGE_ON_POINTER_REST,
       },
       &focus_change_on_pointer_rest
+    },
+    {
+      { "prevent-focus-stealing",
+        SCHEMA_GENERAL,
+        META_PREF_PREVENT_FOCUS_STEALING,
+      },
+      &prevent_focus_stealing
     },
     {
       { "visual-bell",
@@ -1972,6 +1980,9 @@ meta_preference_to_string (MetaPreference pref)
 
     case META_PREF_BRING_WINDOWS_TO_CURRENT_WORKSPACE:
       return "BRING_WINDOWS_TO_CURRENT_WORKSPACE";
+
+    case META_PREF_PREVENT_FOCUS_STEALING:
+      return "PREVENT_FOCUS_STEALING";
     }
 
   return "(unknown)";
@@ -2380,6 +2391,12 @@ gboolean
 meta_prefs_get_focus_change_on_pointer_rest (void)
 {
   return focus_change_on_pointer_rest;
+}
+
+gboolean
+meta_prefs_get_prevent_focus_stealing (void)
+{
+  return prevent_focus_stealing;
 }
 
 gboolean

@@ -26,6 +26,7 @@
 #include <glib.h>
 #include <wayland-server.h>
 
+#include "meta/prefs.h"
 #include "wayland/meta-wayland-private.h"
 #include "wayland/meta-wayland-versions.h"
 
@@ -383,7 +384,7 @@ activation_activate (struct wl_client   *client,
             "startup sequence is older than last user interaction";
     }
 
-    if (can_activate)
+    if (can_activate || !meta_prefs_get_prevent_focus_stealing ())
     {
         uint32_t timestamp;
         int32_t workspace_idx;
