@@ -204,6 +204,10 @@ gtk_surface_request_focus (struct wl_client   *client,
     }
   else
     {
+      g_message ("Wayland activation refused: gtk_surface.request_focus for %s, "
+                 "startup_id=%s has no matching startup sequence",
+                 window->desc, startup_id ? startup_id : "(null)");
+
       meta_window_set_demands_attention (window);
     }
 }
