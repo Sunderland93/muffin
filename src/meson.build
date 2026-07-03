@@ -365,6 +365,8 @@ muffin_sources = [
   'core/meta-sound-player.c',
   'core/meta-workspace-manager.c',
   'core/meta-workspace-manager-private.h',
+  'core/meta-window-debug-dbus.c',
+  'core/meta-window-debug-dbus.h',
   'core/place.c',
   'core/place.h',
   'core/prefs.c',
@@ -972,6 +974,11 @@ executable('muffin',
   dependencies: [libmuffin_dep],
   install_dir: bindir,
   install: true,
+)
+
+install_data('cinnamon-list-windows',
+  install_dir: bindir,
+  install_mode: 'rwxr-xr-x',
 )
 
 executable('muffin-restart-helper',

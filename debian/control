@@ -112,6 +112,7 @@ Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
 Depends: adwaita-icon-theme,
          muffin-common (>= ${source:Version}),
+         python3-gi,
          zenity,
          ${misc:Depends},
          ${shlibs:Depends}

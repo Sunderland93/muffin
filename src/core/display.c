@@ -64,6 +64,7 @@
 #include "core/keybindings-private.h"
 #include "core/main-private.h"
 #include "core/meta-clipboard-manager.h"
+#include "core/meta-window-debug-dbus.h"
 #include "core/meta-workspace-manager-private.h"
 #include "core/util-private.h"
 #include "core/window-private.h"
@@ -995,6 +996,7 @@ meta_display_open (void)
     }
 
   meta_idle_monitor_init_dbus ();
+  meta_window_debug_dbus_init (display);
 
   display->sound_player = g_object_new (META_TYPE_SOUND_PLAYER, NULL);
 
@@ -1148,6 +1150,8 @@ meta_display_close (MetaDisplay *display,
 
   /* Stop caring about events */
   meta_display_free_events (display);
+
+  meta_window_debug_dbus_shutdown ();
 
   g_clear_pointer (&display->compositor, meta_compositor_destroy);
 
