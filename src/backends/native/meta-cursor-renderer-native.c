@@ -1175,6 +1175,51 @@ ensure_cursor_priv (MetaCursorSprite *cursor_sprite)
   return cursor_priv;
 }
 
+static int
+round_up_cursor_dimension (int size,
+                           int max_size)
+{
+  int result = 64;
+
+  while (result < size)
+    result *= 2;
+
+  if (result > max_size)
+    result = max_size;
+
+  return result;
+}
+
+/*
+ * The legacy DRM cursor ioctl only accepts cursor buffers whose dimensions
+ * match a size the driver supports. The DRM_CAP cursor size is just the maximum,
+ * not a promise that every size up to it works: amdgpu, for one, only accepts a
+ * discrete set of sizes (64/128/256 in practice) and rejects anything else with
+ * EINVAL. Pick a supported size that fits the sprite: prefer the sizes the plane
+ * advertises through SIZE_HINTS, and otherwise round up to a power-of-two square
+ * capped at the maximum (which yields amdgpu's set when the cap is 256). The
+ * sprite is then padded into the top-left of that buffer.
+ */
+static void
+get_cursor_bo_size (MetaGpuKms *gpu_kms,
+                    int         width,
+                    int         height,
+                    uint64_t    max_width,
+                    uint64_t    max_height,
+                    int        *out_width,
+                    int        *out_height)
+{
+  MetaKmsDevice *kms_device = meta_gpu_kms_get_kms_device (gpu_kms);
+
+  if (meta_kms_device_get_optimal_cursor_size (kms_device, width, height,
+                                               out_width, out_height))
+    return;
+
+  *out_width = round_up_cursor_dimension (MAX (width, height),
+                                          MIN (max_width, max_height));
+  *out_height = *out_width;
+}
+
 static void
 load_cursor_sprite_gbm_buffer_for_gpu (MetaCursorRendererNative *native,
                                        MetaGpuKms               *gpu_kms,
@@ -1186,6 +1231,7 @@ load_cursor_sprite_gbm_buffer_for_gpu (MetaCursorRendererNative *native,
                                        uint32_t                  gbm_format)
 {
   uint64_t cursor_width, cursor_height;
+  int bo_width, bo_height;
   MetaCursorRendererNativeGpuData *cursor_renderer_gpu_data;
   struct gbm_device *gbm_device;
 
@@ -1204,15 +1250,19 @@ load_cursor_sprite_gbm_buffer_for_gpu (MetaCursorRendererNative *native,
       return;
     }
 
+  get_cursor_bo_size (gpu_kms, width, height,
+                      cursor_width, cursor_height,
+                      &bo_width, &bo_height);
+
   gbm_device = meta_gbm_device_from_gpu (gpu_kms);
   if (gbm_device_is_format_supported (gbm_device, gbm_format,
                                       GBM_BO_USE_CURSOR | GBM_BO_USE_WRITE))
     {
       struct gbm_bo *bo;
-      uint8_t buf[4 * width * height];
+      uint8_t buf[4 * bo_width * bo_height];
       uint i;
 
-      bo = gbm_bo_create (gbm_device, width, height,
+      bo = gbm_bo_create (gbm_device, bo_width, bo_height,
                           gbm_format, GBM_BO_USE_CURSOR | GBM_BO_USE_WRITE);
       if (!bo)
         {
@@ -1222,8 +1272,8 @@ load_cursor_sprite_gbm_buffer_for_gpu (MetaCursorRendererNative *native,
 
       memset (buf, 0, sizeof(buf));
       for (i = 0; i < height; i++)
-        memcpy (buf + i * 4 * width, pixels + i * rowstride, width * 4);
-      if (gbm_bo_write (bo, buf, width * height * 4) != 0)
+        memcpy (buf + i * 4 * bo_width, pixels + i * rowstride, width * 4);
+      if (gbm_bo_write (bo, buf, bo_width * bo_height * 4) != 0)
         {
           meta_warning ("Failed to write cursors buffer data: %s",
                         g_strerror (errno));
@@ -1232,7 +1282,7 @@ load_cursor_sprite_gbm_buffer_for_gpu (MetaCursorRendererNative *native,
         }
 
       set_pending_cursor_sprite_gbm_bo (cursor_sprite, gpu_kms, bo,
-                                        width, height);
+                                        bo_width, bo_height);
     }
   else
     {

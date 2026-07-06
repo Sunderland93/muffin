@@ -143,6 +143,33 @@ meta_kms_device_get_cursor_plane_for (MetaKmsDevice *device,
   return get_plane_with_type_for (device, crtc, META_KMS_PLANE_TYPE_CURSOR);
 }
 
+gboolean
+meta_kms_device_get_optimal_cursor_size (MetaKmsDevice *device,
+                                         int            required_width,
+                                         int            required_height,
+                                         int           *out_width,
+                                         int           *out_height)
+{
+  GList *l;
+
+  for (l = meta_kms_device_get_planes (device); l; l = l->next)
+    {
+      MetaKmsPlane *plane = l->data;
+
+      if (meta_kms_plane_get_plane_type (plane) != META_KMS_PLANE_TYPE_CURSOR)
+        continue;
+
+      if (meta_kms_plane_get_optimal_cursor_size (plane,
+                                                  required_width,
+                                                  required_height,
+                                                  out_width,
+                                                  out_height))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
 void
 meta_kms_device_update_states_in_impl (MetaKmsDevice *device)
 {
