@@ -5622,7 +5622,8 @@ meta_window_raise (MetaWindow  *window)
    */
   if (window->display->stack == ancestor->display->stack)
     {
-      meta_stack_raise (window->display->stack, ancestor);
+      if (meta_window_is_in_stack (ancestor))
+        meta_stack_raise (window->display->stack, ancestor);
     }
   else
     {
@@ -5641,7 +5642,7 @@ meta_window_raise (MetaWindow  *window)
    * raising the ancestor isn't enough; we need to also raise the
    * correct child.  See bug 307875.
    */
-  if (window != ancestor)
+  if (window != ancestor && meta_window_is_in_stack (window))
     meta_stack_raise (window->display->stack, window);
 
   g_signal_emit (window, window_signals[RAISED], 0);
