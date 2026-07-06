@@ -217,7 +217,7 @@ gtk_surface_request_focus (struct wl_client   *client,
         {
           guint32 timestamp;
 
-          timestamp = meta_display_get_current_time_roundtrip (display);
+          timestamp = meta_display_get_current_time (display);
           meta_window_activate_full (window, timestamp,
                                      META_CLIENT_TYPE_APPLICATION, NULL);
         }
