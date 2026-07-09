@@ -49,6 +49,7 @@
 #include "wayland/meta-wayland-subsurface.h"
 #include "wayland/meta-wayland-system-bell.h"
 #include "wayland/meta-wayland-tablet-manager.h"
+#include "wayland/meta-wayland-transaction.h"
 #include "wayland/meta-wayland-xdg-dialog.h"
 #include "wayland/meta-wayland-xdg-foreign.h"
 #include "wayland/meta-wayland-xdg-toplevel-tag.h"
@@ -301,6 +302,12 @@ meta_wayland_compositor_remove_frame_callback_surface (MetaWaylandCompositor *co
     g_list_remove (compositor->frame_callback_surfaces, surface);
 }
 
+GQueue *
+meta_wayland_compositor_get_committed_transactions (MetaWaylandCompositor *compositor)
+{
+  return &compositor->committed_transactions;
+}
+
 static void
 set_gnome_env (const char *name,
 	       const char *value)
@@ -458,6 +465,7 @@ meta_wayland_compositor_setup (MetaWaylandCompositor *wayland_compositor)
   meta_wayland_surface_inhibit_shortcuts_dialog_init ();
   meta_wayland_text_input_init (compositor);
   meta_wayland_activation_init (compositor);
+  meta_wayland_transaction_init (compositor);
   meta_wayland_idle_inhibit_init (compositor);
   meta_wayland_init_xdg_wm_dialog (compositor);
   meta_wayland_xdg_toplevel_tag_init (compositor);
