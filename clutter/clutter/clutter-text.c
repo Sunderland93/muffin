@@ -341,9 +341,10 @@ clutter_text_input_focus_request_surrounding (ClutterInputFocus *focus)
   if (anchor_pos < 0)
     anchor_pos = cursor_pos;
 
-  clutter_input_focus_set_surrounding (focus, text,
-                                       g_utf8_offset_to_pointer (text, cursor_pos) - text,
-                                       g_utf8_offset_to_pointer (text, anchor_pos) - text);
+  /* The input-method funnel deals in character offsets (each backend
+   * converts to its own wire units); passing byte offsets here breaks any
+   * non-ASCII surrounding text. */
+  clutter_input_focus_set_surrounding (focus, text, cursor_pos, anchor_pos);
 }
 
 static void
@@ -355,7 +356,15 @@ clutter_text_input_focus_delete_surrounding (ClutterInputFocus *focus,
   int cursor;
   int start;
 
+  /* A cursor position of -1 means "at the end of the text". */
   cursor = clutter_text_get_cursor_position (clutter_text);
+  if (cursor < 0)
+    {
+      ClutterTextBuffer *buffer = clutter_text_get_buffer (clutter_text);
+
+      cursor = clutter_text_buffer_get_length (buffer);
+    }
+
   start = cursor + offset;
   if (start < 0)
     {
@@ -364,7 +373,9 @@ clutter_text_input_focus_delete_surrounding (ClutterInputFocus *focus,
       return;
     }
   if (clutter_text_get_editable (clutter_text))
-    clutter_text_delete_text (clutter_text, start, len);
+    clutter_text_delete_text (clutter_text, start, start + len);
+
+  clutter_text_input_focus_request_surrounding (focus);
 }
 
 static void
@@ -379,6 +390,7 @@ clutter_text_input_focus_commit_text (ClutterInputFocus *focus,
       clutter_text_insert_text (clutter_text, text,
                                 clutter_text_get_cursor_position (clutter_text));
       clutter_text_set_preedit_string (clutter_text, NULL, NULL, 0);
+      clutter_text_input_focus_request_surrounding (focus);
     }
 }
 
@@ -730,8 +742,19 @@ clutter_text_create_layout_no_cache (ClutterText       *text,
   if (priv->editable && priv->preedit_set)
     {
       GString *tmp = g_string_new (contents);
-      PangoAttrList *tmp_attrs = pango_attr_list_new ();
+      PangoAttrList *tmp_attrs;
       gint cursor_index;
+
+      /* Splice the preedit attributes (its underline) into a copy of the
+       * actor's own attributes rather than using them alone:
+       * pango_layout_set_attributes() replaces rather than merges, and St
+       * styles all of its text through these (foreground color at minimum) -
+       * whichever list were applied second would erase the other's effect. */
+      clutter_text_ensure_effective_attributes (text);
+      if (priv->effective_attrs != NULL)
+        tmp_attrs = pango_attr_list_copy (priv->effective_attrs);
+      else
+        tmp_attrs = pango_attr_list_new ();
 
       if (priv->position == 0)
         cursor_index = 0;
@@ -743,13 +766,11 @@ clutter_text_create_layout_no_cache (ClutterText       *text,
       pango_layout_set_text (layout, tmp->str, tmp->len);
 
       if (priv->preedit_attrs != NULL)
-        {
-          pango_attr_list_splice (tmp_attrs, priv->preedit_attrs,
-                                  cursor_index,
-                                  strlen (priv->preedit_str));
+        pango_attr_list_splice (tmp_attrs, priv->preedit_attrs,
+                                cursor_index,
+                                strlen (priv->preedit_str));
 
-          pango_layout_set_attributes (layout, tmp_attrs);
-        }
+      pango_layout_set_attributes (layout, tmp_attrs);
 
       g_string_free (tmp, TRUE);
       pango_attr_list_unref (tmp_attrs);
@@ -796,10 +817,13 @@ clutter_text_create_layout_no_cache (ClutterText       *text,
     }
 
   /* This will merge the markup attributes and the attributes
-   * property if needed */
+   * property if needed. In the preedit case the merged result was already
+   * applied above, spliced with the preedit attributes - re-setting it here
+   * would erase the preedit underline. */
   clutter_text_ensure_effective_attributes (text);
 
-  if (priv->effective_attrs != NULL)
+  if (priv->effective_attrs != NULL &&
+      !(priv->editable && priv->preedit_set))
     pango_layout_set_attributes (layout, priv->effective_attrs);
 
   pango_layout_set_alignment (layout, priv->alignment);
@@ -1324,13 +1348,15 @@ update_cursor_location (ClutterText *self)
   graphene_rect_t rect;
   float x, y;
 
-  if (!priv->editable)
+  if (!priv->editable ||
+      !clutter_input_focus_is_focused (priv->input_focus))
     return;
 
   rect = priv->cursor_rect;
   clutter_actor_get_transformed_position (CLUTTER_ACTOR (self), &x, &y);
   graphene_rect_offset (&rect, x, y);
   clutter_input_focus_set_cursor_location (priv->input_focus, &rect);
+  clutter_text_input_focus_request_surrounding (priv->input_focus);
 }
 
 static inline void
@@ -2185,6 +2211,10 @@ clutter_text_press (ClutterActor *actor,
     return CLUTTER_EVENT_PROPAGATE;
 
   clutter_actor_grab_key_focus (actor);
+  /* The press may reposition the caret under the input method's feet;
+   * reset it so any ongoing composition is finished first. */
+  if (clutter_input_focus_is_focused (priv->input_focus))
+    clutter_input_focus_reset (priv->input_focus);
   clutter_input_focus_set_input_panel_state (priv->input_focus,
                                              CLUTTER_INPUT_PANEL_STATE_TOGGLE);
 
