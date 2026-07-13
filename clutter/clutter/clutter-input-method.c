@@ -268,10 +268,22 @@ clutter_input_method_focus_out (ClutterInputMethod *im)
   klass->focus_out (im);
 }
 
+/**
+ * clutter_input_method_get_focus:
+ * @im: the #ClutterInputMethod
+ *
+ * Returns the focus that is currently attached to this input method,
+ * or %NULL if the input method has no focus (e.g. the focused client
+ * does not talk to the input method).
+ *
+ * Returns: (transfer none) (nullable): the current #ClutterInputFocus
+ **/
 ClutterInputFocus *
 clutter_input_method_get_focus (ClutterInputMethod *im)
 {
   ClutterInputMethodPrivate *priv;
+
+  g_return_val_if_fail (CLUTTER_IS_INPUT_METHOD (im), NULL);
 
   priv = clutter_input_method_get_instance_private (im);
   return priv->focus;

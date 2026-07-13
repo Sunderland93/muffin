@@ -798,6 +798,7 @@ libmuffin-clutter-0.so.0 libmuffin0 #MINVER#
  clutter_input_method_focus_in@Base 5.3.0
  clutter_input_method_focus_out@Base 5.3.0
  clutter_input_method_forward_key@Base 5.3.0
+ clutter_input_method_get_focus@Base 6.7.4
  clutter_input_method_get_type@Base 5.3.0
  clutter_input_method_notify_key_event@Base 5.3.0
  clutter_input_method_request_surrounding@Base 5.3.0
