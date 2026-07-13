@@ -381,6 +381,13 @@ meta_wayland_seat_handle_event (MetaWaylandSeat *seat,
       !event_from_supported_hardware_device (seat, event))
     return FALSE;
 
+  /* Clicks and touches within the focused surface reposition the caret, so
+   * the input method must reset before the press is forwarded. Pointing
+   * events are never consumed by the input method. */
+  if (event->type == CLUTTER_BUTTON_PRESS ||
+      event->type == CLUTTER_TOUCH_BEGIN)
+    meta_wayland_text_input_handle_event (seat->text_input, event);
+
   switch (event->type)
     {
     case CLUTTER_MOTION:

@@ -662,6 +662,22 @@ meta_wayland_touch_find_grab_sequence (MetaWaylandTouch   *touch,
   return NULL;
 }
 
+MetaWaylandSurface *
+meta_wayland_touch_get_surface (MetaWaylandTouch     *touch,
+                                ClutterEventSequence *sequence)
+{
+  MetaWaylandTouchInfo *touch_info;
+
+  if (!touch->touches)
+    return NULL;
+
+  touch_info = g_hash_table_lookup (touch->touches, sequence);
+  if (!touch_info || !touch_info->touch_surface)
+    return NULL;
+
+  return touch_info->touch_surface->surface;
+}
+
 gboolean
 meta_wayland_touch_get_press_coords (MetaWaylandTouch     *touch,
                                      ClutterEventSequence *sequence,
