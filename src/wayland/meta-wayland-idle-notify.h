@@ -18,7 +18,16 @@
 #ifndef META_WAYLAND_EXT_IDLE_NOTIFY_H
 #define META_WAYLAND_EXT_IDLE_NOTIFY_H
 
+#include "backends/meta-idle-monitor-private.h"
 #include "wayland/meta-wayland-types.h"
+
+void idle_trigger_cb (MetaIdleMonitor *monitor,
+                      guint id,
+                      gpointer user_data);
+
+void active_trigger_cb (MetaIdleMonitor *monitor,
+                        guint id,
+                        gpointer user_data);
 
 void meta_wayland_idle_notify_init (MetaWaylandCompositor *compositor);
 
