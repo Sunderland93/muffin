@@ -38,7 +38,7 @@ typedef struct _MetaWaylandIdleNotification
   gboolean ignore_inhibitors;
 } MetaWaylandIdleNotification;
 
-void
+static void
 active_trigger_cb (MetaIdleMonitor *monitor,
                    guint            id,
                    gpointer         user_data)
@@ -58,13 +58,14 @@ active_trigger_cb (MetaIdleMonitor *monitor,
                                            NULL);
 }
 
-void
+static void
 idle_trigger_cb (MetaIdleMonitor *monitor,
                  guint            id,
                  gpointer         user_data)
 {
   MetaWaylandIdleNotification *notification = user_data;
 
+  meta_idle_monitor_remove_watch (notification->monitor, id);
   notification->idle_watch_id = 0;
 
   ext_idle_notification_v1_send_idled (notification->resource);
