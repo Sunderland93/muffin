@@ -19,6 +19,7 @@
 
 #include "wayland/meta-wayland-idle-notify.h"
 
+#include "backends/meta-idle-monitor-private.h"
 #include "wayland/meta-wayland-private.h"
 #include "wayland/meta-wayland-versions.h"
 
@@ -37,6 +38,10 @@ typedef struct _MetaWaylandIdleNotification
 
   gboolean ignore_inhibitors;
 } MetaWaylandIdleNotification;
+
+static void idle_trigger_cb (MetaIdleMonitor *monitor,
+                             guint            id,
+                             gpointer         user_data);
 
 static void
 active_trigger_cb (MetaIdleMonitor *monitor,
