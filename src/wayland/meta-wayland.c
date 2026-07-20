@@ -59,6 +59,7 @@
 #include "wayland/meta-wayland-xdg-foreign.h"
 #include "wayland/meta-wayland-xdg-toplevel-tag.h"
 #include "wayland/meta-wayland-xdg-toplevel-icon.h"
+#include "wayland/meta-wayland-toplevel-drag.h"
 #include "wayland/meta-wayland-xapp-shell.h"
 #include "wayland/meta-xwayland-grab-keyboard.h"
 #include "wayland/meta-xwayland-private.h"
@@ -482,6 +483,7 @@ meta_wayland_compositor_setup (MetaWaylandCompositor *wayland_compositor)
   meta_wayland_init_xdg_wm_dialog (compositor);
   meta_wayland_xdg_toplevel_tag_init (compositor);
   meta_wayland_xdg_toplevel_icon_init (compositor);
+  meta_wayland_init_toplevel_drag (compositor);
   meta_wayland_xapp_shell_init (compositor);
   meta_wayland_init_cursor_shape (compositor);
   meta_wayland_init_system_bell (compositor);

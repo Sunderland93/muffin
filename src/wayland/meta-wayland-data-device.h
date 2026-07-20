@@ -85,6 +85,8 @@ void     meta_wayland_drag_grab_set_focus        (MetaWaylandDragGrab           
                                                   MetaWaylandSurface              *surface);
 MetaWaylandSurface *
          meta_wayland_drag_grab_get_focus        (MetaWaylandDragGrab             *drag_grab);
+MetaWaylandDataSource *
+         meta_wayland_drag_grab_get_data_source  (MetaWaylandDragGrab             *drag_grab);
 void     meta_wayland_drag_grab_update_feedback_actor (MetaWaylandDragGrab *drag_grab,
                                                        ClutterEvent        *event);
 

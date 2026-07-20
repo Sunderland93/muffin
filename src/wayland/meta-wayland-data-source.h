@@ -109,4 +109,8 @@ gboolean meta_wayland_data_source_get_drop_performed (MetaWaylandDataSource *sou
 void meta_wayland_data_source_notify_drop_performed (MetaWaylandDataSource *source);
 void meta_wayland_data_source_notify_finish (MetaWaylandDataSource *source);
 
+gpointer meta_wayland_data_source_get_toplevel_drag (MetaWaylandDataSource *source);
+void     meta_wayland_data_source_set_toplevel_drag (MetaWaylandDataSource *source,
+                                                     gpointer              toplevel_drag);
+
 #endif /* META_WAYLAND_DATA_SOURCE_H */

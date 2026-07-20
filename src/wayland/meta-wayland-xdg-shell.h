@@ -20,6 +20,7 @@
 #ifndef META_WAYLAND_XDG_SHELL_H
 #define META_WAYLAND_XDG_SHELL_H
 
+#include "meta/boxes.h"
 #include "wayland/meta-wayland-shell-surface.h"
 
 #define META_TYPE_WAYLAND_XDG_SURFACE (meta_wayland_xdg_surface_get_type ())
@@ -49,6 +50,8 @@ G_DECLARE_FINAL_TYPE (MetaWaylandXdgPopup,
                       MetaWaylandXdgSurface);
 
 void meta_wayland_xdg_shell_init (MetaWaylandCompositor *compositor);
+
+MetaRectangle meta_wayland_xdg_surface_get_window_geometry (MetaWaylandXdgSurface *xdg_surface);
 
 void meta_wayland_xdg_popup_set_parent_surface (MetaWaylandXdgPopup *xdg_popup,
                                                 MetaWaylandSurface  *parent_surface);

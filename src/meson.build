@@ -587,6 +587,8 @@ if have_wayland
     'wayland/meta-wayland-tablet-seat.h',
     'wayland/meta-wayland-tablet-tool.c',
     'wayland/meta-wayland-tablet-tool.h',
+    'wayland/meta-wayland-toplevel-drag.c',
+    'wayland/meta-wayland-toplevel-drag.h',
     'wayland/meta-wayland-im-launcher.c',
     'wayland/meta-wayland-im-launcher.h',
     'wayland/meta-wayland-input-method.c',
@@ -858,6 +860,7 @@ if have_wayland
     ['xapp-shell', 'private', ],
     ['xwayland-keyboard-grab', 'unstable', 'v1', ],
     ['wayland-drm', 'private', ],
+    ['xdg-toplevel-drag', 'staging', 'v1', ],
   ]
   if have_wayland_eglstream
     wayland_eglstream_protocols_dir = wayland_eglstream_protocols_dep.get_variable(pkgconfig: 'pkgdatadir')

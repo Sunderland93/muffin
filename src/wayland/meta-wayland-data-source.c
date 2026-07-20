@@ -42,6 +42,7 @@ typedef struct _MetaWaylandDataSourcePrivate
   enum wl_data_device_manager_dnd_action user_dnd_action;
   enum wl_data_device_manager_dnd_action current_dnd_action;
   MetaWaylandSeat *seat;
+  gpointer toplevel_drag;
   guint actions_set : 1;
   guint in_ask : 1;
   guint drop_performed : 1;
@@ -507,7 +508,7 @@ meta_wayland_data_source_add_mime_type (MetaWaylandDataSource *source,
 
 gboolean
 meta_wayland_data_source_has_mime_type (MetaWaylandDataSource *source,
-                                        const char            *mime_type)
+                                         const char            *mime_type)
 {
   MetaWaylandDataSourcePrivate *priv =
     meta_wayland_data_source_get_instance_private (source);
@@ -520,4 +521,23 @@ meta_wayland_data_source_has_mime_type (MetaWaylandDataSource *source,
     }
 
   return FALSE;
+}
+
+gpointer
+meta_wayland_data_source_get_toplevel_drag (MetaWaylandDataSource *source)
+{
+  MetaWaylandDataSourcePrivate *priv =
+    meta_wayland_data_source_get_instance_private (source);
+
+  return priv->toplevel_drag;
+}
+
+void
+meta_wayland_data_source_set_toplevel_drag (MetaWaylandDataSource *source,
+                                            gpointer              toplevel_drag)
+{
+  MetaWaylandDataSourcePrivate *priv =
+    meta_wayland_data_source_get_instance_private (source);
+
+  priv->toplevel_drag = toplevel_drag;
 }
