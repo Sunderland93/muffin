@@ -337,6 +337,7 @@ set_crtc_cursor (MetaCursorRendererNative *native,
                                                 cursor_hotspot_y);
 
   crtc->cursor_renderer_private = bo;
+  crtc->cursor_renderer_active = TRUE;
 
   if (cursor_gpu_state->pending_bo_state == META_CURSOR_GBM_BO_STATE_SET)
     {
@@ -357,7 +358,7 @@ unset_crtc_cursor (MetaCursorRendererNative *native,
   MetaKmsDevice *kms_device;
   MetaKmsPlane *cursor_plane;
 
-  if (!priv->hw_state_invalidated && !crtc->cursor_renderer_private)
+  if (!priv->hw_state_invalidated && !crtc->cursor_renderer_active)
     return;
 
   kms_crtc = meta_crtc_kms_get_kms_crtc (crtc);
@@ -368,6 +369,7 @@ unset_crtc_cursor (MetaCursorRendererNative *native,
     meta_kms_update_unassign_plane (kms_update, kms_crtc, cursor_plane);
 
   crtc->cursor_renderer_private = NULL;
+  crtc->cursor_renderer_active = FALSE;
 }
 
 static float
