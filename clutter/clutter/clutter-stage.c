@@ -156,6 +156,8 @@ struct _ClutterStagePrivate
 
   gboolean needs_update;
 
+  gboolean pending_finish_queue_redraws;
+
   GHashTable *pointer_devices;
   GHashTable *touch_sequences;
 
@@ -3882,6 +3884,8 @@ _clutter_stage_queue_actor_redraw (ClutterStage                 *stage,
    */
   priv->cached_pick_mode = CLUTTER_PICK_NONE;
 
+  priv->pending_finish_queue_redraws = TRUE;
+
   if (!priv->redraw_pending)
     {
       ClutterMasterClock *master_clock;
@@ -3981,6 +3985,12 @@ _clutter_stage_queue_redraw_entry_invalidate (ClutterStageQueueRedrawEntry *entr
 static void
 clutter_stage_maybe_finish_queue_redraws (ClutterStage *stage)
 {
+  ClutterStagePrivate *priv = stage->priv;
+
+  if (!priv->pending_finish_queue_redraws)
+    return;
+
+  priv->pending_finish_queue_redraws = FALSE;
   /* Note: we have to repeat until the pending_queue_redraws list is
    * empty because actors are allowed to queue redraws in response to
    * the queue-redraw signal. For example Clone actors or
