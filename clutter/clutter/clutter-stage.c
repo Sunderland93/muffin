@@ -1477,7 +1477,7 @@ clutter_stage_do_redraw (ClutterStage *stage)
 }
 
 static GSList *
-_clutter_stage_check_updated_pointers (ClutterStage *stage)
+clutter_stage_find_updated_devices (ClutterStage *stage)
 {
   ClutterBackend *backend;
   ClutterSeat *seat;
@@ -1545,7 +1545,7 @@ _clutter_stage_do_update (ClutterStage *stage)
 {
   ClutterStagePrivate *priv = stage->priv;
   gboolean stage_was_relayout = priv->stage_was_relayout;
-  GSList *pointers = NULL;
+  GSList *devices = NULL;
 
   priv->stage_was_relayout = FALSE;
 
@@ -1579,7 +1579,7 @@ _clutter_stage_do_update (ClutterStage *stage)
     }
 
   if (stage_was_relayout)
-    pointers = _clutter_stage_check_updated_pointers (stage);
+    devices = clutter_stage_find_updated_devices (stage);
 
   clutter_stage_maybe_finish_queue_redraws (stage);
   clutter_stage_do_redraw (stage);
@@ -1599,10 +1599,10 @@ _clutter_stage_do_update (ClutterStage *stage)
 
   COGL_TRACE_BEGIN (ClutterStagePick, "Pick");
 
-  while (pointers)
+  while (devices)
     {
-      clutter_input_device_update (pointers->data, NULL, TRUE);
-      pointers = g_slist_delete_link (pointers, pointers);
+      clutter_input_device_update (devices->data, NULL, TRUE);
+      devices = g_slist_delete_link (devices, devices);
     }
 
   COGL_TRACE_END (ClutterStagePick);
