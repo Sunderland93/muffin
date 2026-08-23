@@ -1544,10 +1544,7 @@ gboolean
 _clutter_stage_do_update (ClutterStage *stage)
 {
   ClutterStagePrivate *priv = stage->priv;
-  gboolean stage_was_relayout = priv->stage_was_relayout;
   GSList *devices = NULL;
-
-  priv->stage_was_relayout = FALSE;
 
   priv->needs_update = FALSE;
 
@@ -1578,10 +1575,13 @@ _clutter_stage_do_update (ClutterStage *stage)
       return FALSE;
     }
 
-  if (stage_was_relayout)
-    devices = clutter_stage_find_updated_devices (stage);
-
   clutter_stage_maybe_finish_queue_redraws (stage);
+
+  if (priv->stage_was_relayout)
+    {
+      priv->stage_was_relayout = FALSE;
+      devices = clutter_stage_find_updated_devices (stage);
+    }
   clutter_stage_do_redraw (stage);
 
   /* reset the guard, so that new redraws are possible */
